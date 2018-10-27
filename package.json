@@ -1,0 +1,8 @@
+{
+  "name": "vue-hooks",
+  "version": "0.1.0",
+  "description": "Experimental React hooks implementation in Vue",
+  "main": "index.js",
+  "author": "Evan You",
+  "license": "MIT"
+}
