@@ -1,6 +1,6 @@
 {
   "name": "vue-hooks",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Experimental React hooks implementation in Vue",
   "main": "index.js",
   "author": "Evan You",
