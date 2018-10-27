@@ -88,5 +88,5 @@ export function withHooks(render) {
       callIndex = 0
       return ret
     }
-  })
+  }
 }
