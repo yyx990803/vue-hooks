@@ -1,3 +1,5 @@
+import Vue from 'vue'
+
 let currentInstance = null
 let isMounting = false
 let callIndex = 0
@@ -68,7 +70,7 @@ function injectEffect(key, fn) {
 }
 
 export function withHooks(render) {
-  return Vue.extend({
+  return {
     data() {
       return {
         state: {}
