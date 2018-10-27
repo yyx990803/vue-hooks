@@ -34,14 +34,13 @@ export function useEffect(rawEffect, deps) {
       injectedCleanup()
       const { current } = injectedEffect
       if (current) {
-        injectedCleanup.cleanup = current()
+        injectedCleanup.current = current()
       }
     }
     injectedEffect.current = rawEffect
 
     currentInstance._effectStore[id] = {
       effect: injectedEffect,
-      cleanup: injectedCleanup,
       deps
     }
 
