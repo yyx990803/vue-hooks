@@ -1,5 +1,3 @@
-import Vue from 'vue'
-
 let currentInstance = null
 let isMounting = false
 let callIndex = 0
@@ -14,11 +12,9 @@ export function useState(initial) {
     state[id] = newValue
   }
   if (isMounting) {
-    Vue.set(state, id, initial)
-    return [initial, updater]
-  } else {
-    return [state[id], updater]
+    currentInstance.$set(state, id, initial)
   }
+  return [state[id], updater]
 }
 
 export function useEffect(rawEffect, deps) {
@@ -49,11 +45,10 @@ export function useEffect(rawEffect, deps) {
       deps
     }
 
-    injectEffect('mounted', injectedEffect)
-    injectEffect('destroyed', injectedCleanup)
+    currentInstance.$on('hook:mounted', injectedEffect)
+    currentInstance.$on('hook:destroyed', injectedCleanup)
     if (!deps) {
-      injectEffect('updated', injectedEffect)
-      injectEffect('beforeUpdate', injectedCleanup)
+      currentInstance.$on('hook:updated', injectedEffect)
     }
   } else {
     const { effect, deps: prevDeps = [] } = currentInstance._effectStore[id]
@@ -62,16 +57,6 @@ export function useEffect(rawEffect, deps) {
     } else {
       effect.current = null
     }
-  }
-}
-
-function injectEffect(key, fn) {
-  const { $options } = currentInstance
-  const existing = $options[key]
-  if (existing) {
-    $options[key] = [].concat($options[key], fn)
-  } else {
-    $options[key] = [fn]
   }
 }
 
