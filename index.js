@@ -5,6 +5,9 @@ let isMounting = false
 let callIndex = 0
 
 export function useState(initial) {
+  if (!currentInstance) {
+    throw new Error(`useState must be called in a function passed to withHooks.`)
+  }
   const id = ++callIndex
   const state = currentInstance.state
   const updater = newValue => {
@@ -19,6 +22,9 @@ export function useState(initial) {
 }
 
 export function useEffect(rawEffect, deps) {
+  if (!currentInstance) {
+    throw new Error(`useEffect must be called in a function passed to withHooks.`)
+  }
   const id = ++callIndex
   if (isMounting) {
     const injectedCleanup = () => {
@@ -80,12 +86,11 @@ export function withHooks(render) {
       this._effectStore = []
     },
     render(h) {
+      callIndex = 0
       currentInstance = this
       isMounting = !this._vnode
       const ret = render(h, this.$props)
       currentInstance = null
-      isMounting = false
-      callIndex = 0
       return ret
     }
   }

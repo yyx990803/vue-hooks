@@ -2,6 +2,8 @@
 
 POC for using [React Hooks](https://reactjs.org/docs/hooks-intro.html) in Vue. Totally experimental, don't use this in production.
 
+[Live Demo](https://codesandbox.io/s/jpqo566289)
+
 ``` js
 import Vue from "vue"
 import { withHooks, useState, useEffect } from "vue-hooks"
