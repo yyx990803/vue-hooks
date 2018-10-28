@@ -3,7 +3,49 @@
 <script src="https://unpkg.com/vue"></script>
 <script type="module">
 import('./index.js').then(({ withHooks, useState, useEffect }) => {
-  // a custom hook...
+  // a custom hook that fetches from an API endpoint
+  function useAPI(endpoint) {
+    const [res, setRes] = useState({
+      status: 'pending',
+      data: null,
+      error: null
+    })
+    useEffect(() => {
+      let aborted = false
+      setRes({
+        status: 'pending',
+        data: null,
+        error: null
+      })
+      fetch(endpoint)
+        .then(res => res.json())
+        .then(data => {
+          if (aborted) {
+            return
+          }
+          setRes({
+            status: 'success',
+            data,
+            error: null
+          })
+        }).catch(error => {
+          if (aborted) {
+            return
+          }
+          setRes({
+            status: 'error',
+            data: null,
+            error
+          })
+        })
+      return () => {
+        aborted = true
+      }
+    }, [endpoint])
+    return res
+  }
+
+  // a custom hook that sync with window width
   function useWindowWidth() {
     const [width, setWidth] = useState(window.innerWidth)
     const handleResize = () => {
@@ -30,7 +72,19 @@ import('./index.js').then(({ withHooks, useState, useEffect }) => {
     // custom hook
     const width = useWindowWidth()
 
+    const { status, data, error } = useAPI(`https://jsonplaceholder.typicode.com/todos/${count + 1}`)
+
+    let result
+    if (status === 'pending') {
+      result = h('div', 'loading...')
+    } else if (status === 'success') {
+      result = h('pre', JSON.stringify(data))
+    } else {
+      result = h('pre', { style: { color: 'red' }}, error.toString())
+    }
+
     return h("div", [
+      result,
       h("span", `count is: ${count}`),
       h(
         "button",

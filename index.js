@@ -23,38 +23,38 @@ export function useEffect(rawEffect, deps) {
   }
   const id = ++callIndex
   if (isMounting) {
-    const injectedCleanup = () => {
-      const { current } = injectedCleanup
+    const cleanup = () => {
+      const { current } = cleanup
       if (current) {
         current()
-        injectedCleanup.current = null
+        cleanup.current = null
       }
     }
-    const injectedEffect = () => {
-      injectedCleanup()
-      const { current } = injectedEffect
+    const effect = () => {
+      const { current } = effect
       if (current) {
-        injectedCleanup.current = current()
+        cleanup.current = current()
+        effect.current = null
       }
     }
-    injectedEffect.current = rawEffect
+    effect.current = rawEffect
 
     currentInstance._effectStore[id] = {
-      effect: injectedEffect,
+      effect,
+      cleanup,
       deps
     }
 
-    currentInstance.$on('hook:mounted', injectedEffect)
-    currentInstance.$on('hook:destroyed', injectedCleanup)
-    if (!deps) {
-      currentInstance.$on('hook:updated', injectedEffect)
-    }
+    currentInstance.$on('hook:mounted', effect)
+    currentInstance.$on('hook:destroyed', cleanup)
+    currentInstance.$on('hook:updated', effect)
   } else {
-    const { effect, deps: prevDeps = [] } = currentInstance._effectStore[id]
+    const record = currentInstance._effectStore[id]
+    const { effect, cleanup, deps: prevDeps = [] } = record
+    record.deps = deps
     if (!deps || deps.some((d, i) => d !== prevDeps[i])) {
+      cleanup()
       effect.current = rawEffect
-    } else {
-      effect.current = null
     }
   }
 }
