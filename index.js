@@ -2,10 +2,16 @@ let currentInstance = null
 let isMounting = false
 let callIndex = 0
 
-export function useState(initial) {
+function ensureCurrentInstance() {
   if (!currentInstance) {
-    throw new Error(`useState must be called in a function passed to withHooks.`)
+    throw new Error(
+      `invalid hooks call: hooks can only be called in a function passed to withHooks.`
+    )
   }
+}
+
+export function useState(initial) {
+  ensureCurrentInstance()
   const id = ++callIndex
   const state = currentInstance.state
   const updater = newValue => {
@@ -18,9 +24,7 @@ export function useState(initial) {
 }
 
 export function useEffect(rawEffect, deps) {
-  if (!currentInstance) {
-    throw new Error(`useEffect must be called in a function passed to withHooks.`)
-  }
+  ensureCurrentInstance()
   const id = ++callIndex
   if (isMounting) {
     const cleanup = () => {
@@ -47,7 +51,9 @@ export function useEffect(rawEffect, deps) {
 
     currentInstance.$on('hook:mounted', effect)
     currentInstance.$on('hook:destroyed', cleanup)
-    currentInstance.$on('hook:updated', effect)
+    if (!deps || deps.lenght > 0) {
+      currentInstance.$on('hook:updated', effect)
+    }
   } else {
     const record = currentInstance._effectStore[id]
     const { effect, cleanup, deps: prevDeps = [] } = record
@@ -59,6 +65,61 @@ export function useEffect(rawEffect, deps) {
   }
 }
 
+export function useRef(initial) {
+  ensureCurrentInstance()
+  const id = ++callIndex
+  const { _refsStore: refs } = currentInstance
+  return isMounting ? (refs[id] = { current: initial }) : refs[id]
+}
+
+export function useData(initial) {
+  const id = ++callIndex
+  const { state } = currentInstance
+  if (isMounting) {
+    currentInstance.$set(state, id, initial)
+  }
+  return state[id]
+}
+
+export function useMounted(fn) {
+  useEffect(fn, [])
+}
+
+export function useUnmounted(fn) {
+  useEffect(() => fn, [])
+}
+
+export function useUpdated(fn, deps) {
+  const isMount = useRef(true)
+  useEffect(() => {
+    if (isMount.current) {
+      isMount.current = false
+    } else {
+      return fn()
+    }
+  }, deps)
+}
+
+export function useWatch(getter, cb, options) {
+  ensureCurrentInstance()
+  if (isMounting) {
+    currentInstance.$watch(getter, cb, options)
+  }
+}
+
+export function useComputed(getter) {
+  ensureCurrentInstance()
+  const id = ++callIndex
+  const store = currentInstance._computedStore
+  if (isMounting) {
+    store[id] = getter()
+    currentInstance.$watch(getter, val => {
+      store[id] = val
+    }, { sync: true })
+  }
+  return store[id]
+}
+
 export function withHooks(render) {
   return {
     data() {
@@ -67,7 +128,9 @@ export function withHooks(render) {
       }
     },
     created() {
-      this._effectStore = []
+      this._effectStore = {}
+      this._refsStore = {}
+      this._computedStore = {}
     },
     render(h) {
       callIndex = 0

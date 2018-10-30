@@ -1,0 +1,39 @@
+<div id="app"></div>
+
+<script src="https://unpkg.com/vue"></script>
+<script type="module">
+import('./index.js').then(({ withHooks, useData, useMounted, useWatch, useComputed }) => {
+  // API that maps Vue's existing API
+  const Foo = withHooks(h => {
+    const data = useData({
+      count: 0
+    })
+
+    const double = useComputed(() => data.count * 2)
+
+    useWatch(() => data.count, (val, prevVal) => {
+      console.log(`count is: ${val}`)
+    })
+
+    useMounted(() => {
+      console.log('mounted!')
+    })
+
+    return h('div', [
+      h('div', `count is ${data.count}`),
+      h('div', `double count is ${double}`),
+      h('button', { on: { click: () => {
+        // still got that direct mutation!
+        data.count++
+      }}}, 'count++')
+    ])
+  })
+
+  new Vue({
+    el: "#app",
+    render(h) {
+      return h("div", [h(Foo), h(Foo)])
+    }
+  })
+})
+</script>

@@ -4,6 +4,8 @@ POC for using [React Hooks](https://reactjs.org/docs/hooks-intro.html) in Vue. T
 
 [Live Demo](https://codesandbox.io/s/jpqo566289)
 
+### React-style Hooks
+
 ``` js
 import Vue from "vue"
 import { withHooks, useState, useEffect } from "vue-hooks"
@@ -56,5 +58,44 @@ new Vue({
   render(h) {
     return h("div", [h(Foo), h(Foo)])
   }
+})
+```
+
+### Vue-style Hooks
+
+API that maps Vue's existing API.
+
+``` js
+import {
+  withHooks,
+  useData,
+  useComputed,
+  useWatch,
+  useMounted
+} from "vue-hooks"
+
+const Foo = withHooks(h => {
+  const data = useData({
+    count: 0
+  })
+
+  const double = useComputed(() => data.count * 2)
+
+  useWatch(() => data.count, (val, prevVal) => {
+    console.log(`count is: ${val}`)
+  })
+
+  useMounted(() => {
+    console.log('mounted!')
+  })
+
+  return h('div', [
+    h('div', `count is ${data.count}`),
+    h('div', `double count is ${double}`),
+    h('button', { on: { click: () => {
+      // still got that direct mutation!
+      data.count++
+    }}}, 'count++')
+  ])
 })
 ```
