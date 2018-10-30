@@ -2,7 +2,7 @@
 
 <script src="https://unpkg.com/vue"></script>
 <script type="module">
-import('./index.js').then(({ withHooks, useData, useMounted, useWatch, useComputed }) => {
+import('./index.js').then(({ withHooks, useData, useMounted, useUpdated, useDestroyed, useWatch, useComputed }) => {
   // API that maps Vue's existing API
   const Foo = withHooks(h => {
     const data = useData({
@@ -17,6 +17,12 @@ import('./index.js').then(({ withHooks, useData, useMounted, useWatch, useComput
 
     useMounted(() => {
       console.log('mounted!')
+    })
+    useUpdated(() => {
+      console.log('updated!')
+    })
+    useDestroyed(() => {
+      console.log('destroyed!')
     })
 
     return h('div', [

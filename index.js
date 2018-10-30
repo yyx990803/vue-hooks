@@ -85,7 +85,7 @@ export function useMounted(fn) {
   useEffect(fn, [])
 }
 
-export function useUnmounted(fn) {
+export function useDestroyed(fn) {
   useEffect(() => fn, [])
 }
 

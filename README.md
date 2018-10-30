@@ -71,7 +71,9 @@ import {
   useData,
   useComputed,
   useWatch,
-  useMounted
+  useMounted,
+  useUpdated,
+  useDestroyed
 } from "vue-hooks"
 
 const Foo = withHooks(h => {
@@ -87,6 +89,12 @@ const Foo = withHooks(h => {
 
   useMounted(() => {
     console.log('mounted!')
+  })
+  useUpdated(() => {
+    console.log('updated!')
+  })
+  useDestroyed(() => {
+    console.log('destroyed!')
   })
 
   return h('div', [
