@@ -13,7 +13,7 @@ function ensureCurrentInstance() {
 export function useState(initial) {
   ensureCurrentInstance()
   const id = ++callIndex
-  const state = currentInstance.state
+  const state = currentInstance.$data._state
   const updater = newValue => {
     state[id] = newValue
   }
@@ -74,7 +74,7 @@ export function useRef(initial) {
 
 export function useData(initial) {
   const id = ++callIndex
-  const { state } = currentInstance
+  const state = currentInstance.$data._state
   if (isMounting) {
     currentInstance.$set(state, id, initial)
   }
@@ -124,7 +124,7 @@ export function withHooks(render) {
   return {
     data() {
       return {
-        state: {}
+        _state: {}
       }
     },
     created() {
@@ -141,4 +141,37 @@ export function withHooks(render) {
       return ret
     }
   }
+}
+
+export function hooks (Vue) {
+  Vue.mixin({
+    beforeCreate() {
+      const { hooks, data } = this.$options
+      if (hooks) {
+        this._effectStore = {}
+        this._refsStore = {}
+        this._computedStore = {}
+        this.$options.data = function () {
+          const ret = data ? data.call(this) : {}
+          ret._state = {}
+          return ret
+        }
+      }
+    },
+    beforeMount() {
+      const { hooks, render } = this.$options
+      if (hooks && render) {
+        this.$options.render = function(h) {
+          callIndex = 0
+          currentInstance = this
+          isMounting = !this._vnode
+          const hookProps = hooks(this.$props)
+          Object.assign(this._self, hookProps)
+          const ret = render.call(this, h)
+          currentInstance = null
+          return ret
+        }
+      }
+    }
+  })
 }

@@ -99,3 +99,31 @@ const Foo = withHooks(h => {
   ])
 })
 ```
+
+### Usage in Normal Vue Components
+
+``` js
+import { hooks, useData, useComputed } from 'vue-hooks'
+
+Vue.use(hooks)
+
+new Vue({
+  template: `
+    <div @click="data.count++">
+      {{ data.count }} {{ double }}
+    </div>
+  `,
+  hooks() {
+    const data = useData({
+      count: 0
+    })
+
+    const double = useComputed(() => data.count * 2)
+
+    return {
+      data,
+      double
+    }
+  }
+})
+```

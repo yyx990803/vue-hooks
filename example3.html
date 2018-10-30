@@ -1,0 +1,36 @@
+<div id="app">
+  <div>count is: {{ data.count }}</div>
+  <div>double is: {{ double }}</div>
+  <button @click="data.count++">count++</button>
+</div>
+
+<script src="https://unpkg.com/vue"></script>
+<script type="module">
+import('./index.js').then(({ hooks, useData, useMounted, useWatch, useComputed }) => {
+  Vue.use(hooks)
+
+  new Vue({
+    el: "#app",
+    hooks() {
+      const data = useData({
+        count: 0
+      })
+
+      const double = useComputed(() => data.count * 2)
+
+      useWatch(() => data.count, (val, prevVal) => {
+        console.log(`count is: ${val}`)
+      })
+
+      useMounted(() => {
+        console.log('mounted!')
+      })
+
+      return {
+        data,
+        double
+      }
+    }
+  })
+})
+</script>
