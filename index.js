@@ -136,7 +136,7 @@ export function withHooks(render) {
       callIndex = 0
       currentInstance = this
       isMounting = !this._vnode
-      const ret = render(h, this.$props)
+      const ret = render(h, this.$attrs, this.$props)
       currentInstance = null
       return ret
     }
