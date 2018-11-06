@@ -51,7 +51,7 @@ export function useEffect(rawEffect, deps) {
 
     currentInstance.$on('hook:mounted', effect)
     currentInstance.$on('hook:destroyed', cleanup)
-    if (!deps || deps.lenght > 0) {
+    if (!deps || deps.length > 0) {
       currentInstance.$on('hook:updated', effect)
     }
   } else {
