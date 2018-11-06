@@ -6,31 +6,30 @@
 
 <script src="https://unpkg.com/vue"></script>
 <script type="module">
-import('./index.js').then(({ hooks, useData, useMounted, useWatch, useComputed }) => {
-  Vue.use(hooks)
+import { hooks, useData, useMounted, useWatch, useComputed } from './index.js'
+Vue.use(hooks)
 
-  new Vue({
-    el: "#app",
-    hooks() {
-      const data = useData({
-        count: 0
-      })
+new Vue({
+  el: "#app",
+  hooks() {
+    const data = useData({
+      count: 0
+    })
 
-      const double = useComputed(() => data.count * 2)
+    const double = useComputed(() => data.count * 2)
 
-      useWatch(() => data.count, (val, prevVal) => {
-        console.log(`count is: ${val}`)
-      })
+    useWatch(() => data.count, (val, prevVal) => {
+      console.log(`count is: ${val}`)
+    })
 
-      useMounted(() => {
-        console.log('mounted!')
-      })
+    useMounted(() => {
+      console.log('mounted!')
+    })
 
-      return {
-        data,
-        double
-      }
+    return {
+      data,
+      double
     }
-  })
+  }
 })
 </script>
