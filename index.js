@@ -34,10 +34,10 @@ export function useEffect(rawEffect, deps) {
         cleanup.current = null
       }
     }
-    const effect = () => {
+    const effect = function() {
       const { current } = effect
       if (current) {
-        cleanup.current = current()
+        cleanup.current = current.call(this)
         effect.current = null
       }
     }
