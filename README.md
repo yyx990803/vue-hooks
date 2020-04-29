@@ -1,3 +1,11 @@
+# **!!! ARCHIVED !!!**
+
+Vue now has its own hooks inspired API for composing logic: https://composition-api.vuejs.org/
+
+This PoC has completed its purpose and will no longer be updated.
+
+---
+
 # vue-hooks
 
 POC for using [React Hooks](https://reactjs.org/docs/hooks-intro.html) in Vue. Totally experimental, don't use this in production.
